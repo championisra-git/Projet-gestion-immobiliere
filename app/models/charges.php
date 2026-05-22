@@ -1,5 +1,4 @@
 <?php
-// app/models/bienimo.php
 
 class Charges {
 
