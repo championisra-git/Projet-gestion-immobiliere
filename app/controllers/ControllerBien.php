@@ -65,7 +65,7 @@ class ControllerBien {
             exit();
         }
         $pageTitle   = 'Modifier la propriété';        
-        $viewFile    = 'app/views/bienimos/edit.php';
+        $viewFile    = dirname(__DIR__).'includes/views/bienimos/edit.php';
         require 'app/views/layout/main.php';
     }
 

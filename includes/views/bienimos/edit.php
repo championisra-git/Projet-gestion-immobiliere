@@ -1,6 +1,6 @@
 <h1>
             Modifier le bien
-            <span class="id-badge">#<?= htmlspecialchars($bien['id']) ?></span>
+            <span class="id-badge">#<?= htmlspecialchars($bienimo['id']) ?></span>
         </h1>
         <span><?= htmlspecialchars($bien['titre']) ?></span>
     </div>
@@ -9,7 +9,7 @@
 <div class="card">
  
     <div class="info-note">
-        ℹ️ Seuls le titre, le statut et le prix de location sont modifiables via cette interface.
+        Seuls le titre, le statut et le prix de location sont modifiables via cette interface.
     </div>
  
     <form method="POST" action="edit.php">
