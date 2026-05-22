@@ -1,7 +1,6 @@
 <?php
-// app/models/bienimo.php
 
-class Charges {
+class Maintenance {
 
     private PDO $pdo;
 
@@ -9,7 +8,6 @@ class Charges {
         $this->pdo = $pdo;
     }
 
-    // Lister — avec filtre statut optionnel
    public function findAll(?string $id_loyé = null,?string $statut = null): array {
          if ($id_loyé) {
             $s = $this->pdo->prepare(
@@ -28,10 +26,9 @@ class Charges {
         }
         return $s->fetchAll();
     }
-    // Trouver un seul bien
     public function findById(int $id): array|false {
         $s = $this->pdo->prepare(
-            'SELECT * FROM charges WHERE id = ?'
+            'SELECT * FROM maintenance WHERE id = ?'
         );
         $s->execute([$id]);
         return $s->fetch();
@@ -44,26 +41,23 @@ class Charges {
         $s->execute([$id_loyé]);
         return $s->fetch();
     }
-    public function findOuverts(): array |false{
+    public function findOuverts(): array {
          $s = $this->pdo->prepare(
-            'SELECT * FROM maintenance WHERE statut = ouvert'
+            'SELECT * FROM maintenance WHERE statut = "ouvert"'
         );
-        return $s->fetch();
+        $s->execute();
+        return $s->fetchAll();
     }
     public function close(int $id): bool{
-        $d['id'] = $id;
         $s = $this->pdo->prepare(
-            'UPDATE maintenace SET statut="resolu" WHERE id=?'
+            'UPDATE maintenance SET statut="resolu" WHERE id = ?'
         );
-        $s->execute($d);
-        return $s->fetch();
-
+        return $s->execute([$id]);
     }
 
-    // Créer
     public function create(array $d): int {
         $s = $this->pdo->prepare(
-            'INSERT INTO maintenace
+            'INSERT INTO maintenance
              (id_loyé,titre,urgence,statut,date_signalement,date_resolution,description)
              VALUES (:id_loyé,:titre,:urgence,:statut,:date_signalement,:date_resolution,:description)'
         );
@@ -71,20 +65,18 @@ class Charges {
         return (int) $this->pdo->lastInsertId();
     }
 
-    // Modifier
+    
     public function update(int $id, array $d): bool {
         $d['id'] = $id;
         $s = $this->pdo->prepare(
-            'UPDATE maintenace SET id_loyé=:id_loyé, titre=:titre, urgence=:urgence, 
+            'UPDATE maintenance SET id_loyé=:id_loyé, titre=:titre, urgence=:urgence, 
              statut=:statut,date_signalement=:date_signalement,date_resolution=:date_resolution,description=:description WHERE id=:id'
         );
         return $s->execute($d);
     }
-
-    // Supprimer
     public function delete(int $id): bool {
         $s = $this->pdo->prepare(
-            'DELETE FROM maintenace WHERE id = ?'
+            'DELETE FROM maintenance WHERE id = ?'
         );
         return $s->execute([$id]);
     }
