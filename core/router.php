@@ -3,58 +3,45 @@
 
 class Router {
 
-    private $ctrl;
+    private PDO $pdo;
 
-    public function routeReq(): void {
+    // Mapping ctrl → fichier contrôleur + classe
+    private array $routes = [
+        'auth'        => ['AuthController',        'app/controllers/AuthController.php'],
+        'utilisateur' => ['UserController',        'app/controllers/UserController.php'],
+        'bienimo'     => ['ControllerBien',        'app/controllers/ControllerBien.php'],
+        'proprietaire'=> ['ProprietaireController','app/controllers/ProprietaireController.php'],
+        'locataire'   => ['LocataireController',   'app/controllers/LocataireController.php'],
+        'loyer'       => ['LoyerController',       'app/controllers/LoyerController.php'],
+        'paiement'    => ['PaymentController',     'app/controllers/PaymentController.php'],
+        'factures'    => ['FactureController',     'app/controllers/FactureController.php'],
+        'charges'     => ['DepenseController',     'app/controllers/DepenseController.php'],
+        'maintenance' => ['MaintenanceController', 'app/controllers/MaintenanceController.php'],
+        'visite'      => ['VisiteController',      'app/controllers/VisiteController.php'],
+    ];
 
-        spl_autoload_register(function(string $class): void {
-            $paths = [
-                dirname(__DIR__) . '/app/models/'      . $class . '.php',
-                dirname(__DIR__) . '/app/controllers/' . $class . '.php',
-                dirname(__DIR__) . '/core/'            . $class . '.php',
-            ];
-            foreach ($paths as $path) {
-                if (file_exists($path)) {
-                    require_once $path;
-                    return;
-                }
-            }
-        });
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+    }
 
-        try {
-            // URL par défaut → dashboard
-            $url = ['dashboard', 'index'];
-
-            if (isset($_GET['url'])) {
-                $url = explode(
-                    '/',
-                    filter_var(trim($_GET['url'], '/'), FILTER_SANITIZE_URL)
-                );
-            }
-
-            // "property" → "PropertyController"
-            $controllerName  = ucfirst(strtolower($url[0] ?? 'dashboard'));
-            $controllerClass = $controllerName . 'Controller';
-            $controllerFile  = dirname(__DIR__) . '/app/controllers/'
-                               . $controllerClass . '.php';
-
-            if (!file_exists($controllerFile)) {
-                throw new Exception("Contrôleur introuvable : $controllerClass");
-            }
-
-            require_once $controllerFile;
-
-            if (!class_exists($controllerClass)) {
-                throw new Exception("Classe introuvable : $controllerClass");
-            }
-
-            // Passe le tableau $url complet au contrôleur
-            $this->ctrl = new $controllerClass($url);
-
-        } catch (Exception $e) {
-            error_log($e->getMessage());
+    public function dispatch(string $ctrl, string $action): void {
+        if (!isset($this->routes[$ctrl])) {
             http_response_code(404);
-            require dirname(__DIR__) . '/app/views/404.php';
+            require 'app/views/404.php';
+            return;
         }
+
+        [$class, $file] = $this->routes[$ctrl];
+        require_once $file;
+
+        $controller = new $class($this->pdo);
+
+        if (!method_exists($controller, $action)) {
+            http_response_code(404);
+            require 'app/views/404.php';
+            return;
+        }
+
+        $controller->$action();
     }
 }
