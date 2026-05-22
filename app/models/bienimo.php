@@ -69,10 +69,15 @@ class Bienimo {
     }
 
     // Supprimer
-    public function delete(int $id): bool {
-        $s = $this->pdo->prepare(
-            'DELETE FROM bien_immobilier WHERE id = ?'
-        );
-        return $s->execute([$id]);
-    }
+   public function delete(int $id, int $owner_id): bool {
+
+    $s = $this->pdo->prepare(
+        'DELETE FROM bien_immobilier
+         WHERE id = ?
+         AND owner_id = ?
+         AND statut = "libre"'
+    );
+
+    return $s->execute([$id, $owner_id]);
+}
 }

@@ -1,5 +1,4 @@
 <?php
-// app/models/bienimo.php
 
 class Proprietaire {
 
@@ -9,7 +8,6 @@ class Proprietaire {
         $this->pdo = $pdo;
     }
 
-    // Lister — avec filtre 
     public function findAll(?string $ville = null,?string $pays = null): array {
          if ($ville) {
             $s = $this->pdo->prepare(
@@ -30,7 +28,6 @@ class Proprietaire {
     }
 
 
-    // Trouver un seul bien
     public function findById(int $id): array|false {
         $s = $this->pdo->prepare(
             'SELECT * FROM proprietaire WHERE id = ?'
@@ -39,10 +36,9 @@ class Proprietaire {
         return $s->fetch();
     }
 
-    // Créer
     public function create(array $d): int {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO utilisateur
+            'INSERT INTO proprietaire
              (id,user_id,addresse,ville,pays)
              VALUES (:id,:user_id,:addresse,:ville,:pays)'
         );
@@ -50,7 +46,6 @@ class Proprietaire {
         return (int) $this->pdo->lastInsertId();
     }
 
-    // Modifier
     public function update(int $id, array $d): bool {
         $d['id'] = $id;
         $stmt = $this->pdo->prepare(
@@ -59,14 +54,12 @@ class Proprietaire {
         );
         return $stmt->execute($d);
     }
-
-    // Supprimer
     public function delete(int $id): bool {
         $stmt = $this->pdo->prepare(
             'DELETE FROM proprietaire WHERE id = ?'
         );
         $stmt2 = $this->pdo->prepare(
-            'DELETE bienimo WHERE owner_id = ?'
+            'DELETE FROM bienimo WHERE owner_id = ?'
         );
         $stmt2->execute([$id]);
 

@@ -1,5 +1,4 @@
 <?php
-// app/models/bienimo.php
 
 class Paiement {
 
@@ -9,8 +8,7 @@ class Paiement {
         $this->pdo = $pdo;
     }
 
-    // Lister — avec filtre statut optionnel
-   public function findAll(?string $statut = null): array {
+    public function findAll(?string $statut = null): array {
          if ($statut) {
             $s = $this->pdo->prepare(
                 'SELECT * FROM paiement WHERE statut=? ORDER BY id ASC'
@@ -23,7 +21,13 @@ class Paiement {
         }
         return $s->fetchAll();
     }
-    // Trouver un seul bien
+     public function findById(int $id): array|false {
+        $s = $this->pdo->prepare(
+            'SELECT * FROM paiement WHERE id = ?'
+        );
+        $s->execute([$id]);
+        return $s->fetch();
+    }
     public function findparloyer(int $id_loyer): array|false {
         $s = $this->pdo->prepare(
             'SELECT * FROM paiement WHERE id_loyer = ?'
@@ -33,9 +37,10 @@ class Paiement {
     }
     public function findEnRetard(): array|false{
        $s = $this->pdo->prepare(
-            'SELECT * FROM paiement WHERE statut = "en retard"'
+            'SELECT * FROM paiement WHERE statut = ?'
         );
-        return $s->fetch();  
+        $s->execute(['en retard']);
+        return $s->fetchAll();  
     }
     public function totalparloyer(int $id_loyer): array|false{
         $s = $this->pdo->prepare(
@@ -45,18 +50,16 @@ class Paiement {
         return $s->fetch();  
     }   
 
-    // Créer
     public function create(array $d): int {
         $s = $this->pdo->prepare(
             'INSERT INTO paiement
              (id_loyer,mois_concerne,montant,date_paiement,mode_paiement,statut)
-             VALUES (:id_loyer,:mois_concerne,:montant,:date_paiment,:mode_paiement,:statut)'
+             VALUES (:id_loyer,:mois_concerne,:montant,:date_paiement,:mode_paiement,:statut)'
         );
         $s->execute($d);
         return (int) $this->pdo->lastInsertId();
     }
 
-    // Modifier
     public function update(int $id, array $d): bool {
         $d['id'] = $id;
         $s = $this->pdo->prepare(
@@ -66,7 +69,6 @@ class Paiement {
         return $s->execute($d);
     }
 
-    // Supprimer
     public function delete(int $id): bool {
         $s = $this->pdo->prepare(
             'DELETE FROM paiement WHERE id = ?'
