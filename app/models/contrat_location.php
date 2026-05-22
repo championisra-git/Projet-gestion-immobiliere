@@ -45,11 +45,12 @@ class Contract_location {
         $s->execute([$id_proprieté]);
         return $s->fetch();  
     }
-    public function findActifs(){ 
+    public function findActifs(): array {
          $s = $this->pdo->prepare(
             'SELECT * FROM contrat_location WHERE statut = "actifs"'
         );
-        return $s->fetch();
+        $s->execute();
+        return $s->fetchAll();
     }
 
     // Créer

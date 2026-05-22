@@ -1,5 +1,4 @@
 <?php
-// app/models/bienimo.php
 
 class Utilisateur {
 
@@ -17,8 +16,8 @@ class Utilisateur {
     
         return $stmt->fetchAll();
     }
-    public function findByRole(string $role): array|false{
-        $stmt = $this->pdo->query(
+    public function findByRole(string $role): array {
+        $stmt = $this->pdo->prepare(
             'SELECT * FROM utilisateur WHERE role = ?'
         );
         $stmt->execute([$role]);
@@ -50,13 +49,12 @@ class Utilisateur {
     public function update(int $id, array $d): bool {
         $d['id'] = $id;
         $stmt = $this->pdo->prepare(
-            'UPDATE bien_immobilier SET nom=:nom, prenom=:prenom,
+            'UPDATE utilisateur SET nom=:nom, prenom=:prenom,
              password=:password, telephone=:telephone, role=:role, actif=:actif WHERE id=:id'
         );
         return $stmt->execute($d);
     }
 
-    // Supprimer
     public function delete(int $id): bool {
         $stmt = $this->pdo->prepare(
             'DELETE FROM utilisateur WHERE id = ?'
